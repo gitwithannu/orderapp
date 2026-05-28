@@ -43,7 +43,7 @@ export default function AgentOrdersPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {orders.map((order:any) => (
                 <tr key={order._id}>
                   <td className="border p-3">{order.orderNumber}</td>
                   <td className="border p-3">{order.customerName}</td>
