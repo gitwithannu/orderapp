@@ -1,0 +1,122 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getUser } from "@/utils/getUser"; // your JWT decode helper
+
+export default function ProductsPage() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const user = getUser(); // contains role + permissions
+
+  console.log('============ user permission =============',user)
+  const permissions = user?.permissions || [];
+
+const canAdd = permissions.includes("manage_products");
+const canEdit = permissions.includes("manage_products");
+const canDelete = permissions.includes("manage_products");
+
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setProducts(data.products || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Product fetch error:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  async function handleDelete(id) {
+  if (!confirm("Are you sure you want to delete this product?")) return;
+
+  const res = await fetch(`/api/products/${id}`, {
+    method: "DELETE",
+  });
+
+  if (res.ok) {
+    // Remove deleted product from UI
+    setProducts(prev => prev.filter(p => p._id !== id));
+  }
+}
+
+
+  if (loading) return <div className="p-8 text-center">Loading products...</div>;
+
+  return (
+    <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-5xl mx-auto bg-white shadow rounded p-8">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold">Products</h1>
+
+          {canAdd && (
+            <Link
+              href="/products/add"
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              + Add Product
+            </Link>
+          )}
+        </div>
+
+        {products.length === 0 ? (
+          <p>No products found.</p>
+        ) : (
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-3 text-left">Product Name</th>
+                <th className="border p-3 text-left">Variants</th>
+                <th className="border p-3 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p._id}>
+                  <td className="border p-3">{p.product_name}</td>
+
+                  <td className="border p-3">
+                    {p.variants
+                      .map((v) => `${v.type} ${v.size} ₹${v.price}`)
+                      .join(", ")}
+                  </td>
+
+                  <td className="border p-3 space-x-2">
+                    {canEdit && (
+                      <Link
+                        href={`/admin/products/${p._id}`}
+                        className="px-3 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      >
+                        Edit
+                      </Link>
+                    )}
+
+                    {canDelete && (
+                      <button
+                        onClick={() => handleDelete(p._id)}
+                        className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    )}
+
+                    {!canEdit && !canDelete && (
+                      <span className="text-gray-400">No actions allowed</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Delete handler
+

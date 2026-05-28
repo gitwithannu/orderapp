@@ -1,0 +1,39 @@
+[
+ {
+    "id": 1,
+    "state": "Chandigarh",
+   "cities": [
+      "Chandigarh"
+    ]
+  },
+  {
+    "id": 2,
+    "state": "Punjab",
+    "cities": [
+      "Mohali",
+      "Ludhiana",
+      "Amritsar",
+      "Jalandhar",
+      "Patiala",
+      "Bathinda",
+      "Hoshiarpur",
+      "Pathankot"
+    ]
+  },
+  {
+    "id": 3,
+    "state": "Haryana",
+    "cities": [
+      "Panckula",
+      "Karnal",
+      "Ambala",
+      "Gurgaon",
+      "Faridabad",
+      "Panipat",
+      "Hisar",
+      "Rohtak",
+      "Sonipat"
+    ]
+  }
+
+]

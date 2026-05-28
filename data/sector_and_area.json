@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "cities": ["Chandigarh"],
+    "sector": ["sector 1", "sector 2", "sector 3", "sector 4", "sector 5", "sector 6", "sector 7", "sector 55", "sector 56", "palsora"]
+  },
+  {
+    "id": 2,
+    "cities": ["Mohali"],
+    "sector": ["Phase 1", "Phase 2", "Phase 3A", "Phase 3B1", "Phase 3B2", "Phase 4", "Phase 5", "Phase 6", "Phase 7", "Phase 8", "Phase 9", "Phase 10", "Phase 11", "Phase 12", "Sector 70", "Sector 71", "Sector 79", "Sector 80", "Sector 81", "Sector 82", "Sector 83", "Sector 84", "Sector 85"]
+  },
+  {
+    "id": 3,
+    "cities": ["Ludhiana"],
+    "sector": ["Model Town", "Sarabha Nagar", "Civil Lines", "PAU", "BRS Nagar", "Gill Road", "Ferozepur Road", "Dugri", "Haibowal", "Jamalpur", "Shimlapuri", "Moti Nagar", "Kitchlu Nagar", "New Model Town", "Urban Estate"]
+  },
+  {
+    "id": 4,
+    "cities": ["Panchkula"],
+    "sector": ["Sector 1", "Sector 2", "Sector 3", "Sector 4", "Sector 5", "Sector 6", "Sector 7", "Sector 8", "Sector 9", "Sector 10", "Sector 11", "Sector 12", "Sector 15", "Sector 16", "Sector 17", "Sector 18", "Sector 19", "Sector 20", "Sector 21", "Sector 25", "Sector 26", "Sector 27", "Sector 28", "Sector 29", "Sector 30"]
+  },
+  {
+    "id": 5,
+    "cities": ["Karnal"],
+    "sector": ["Sector 6", "Sector 7", "Sector 8", "Sector 9", "Sector 12", "Sector 13", "Sector 32", "Sector 33", "Model Town", "Kunjpura Road", "Civil Lines", "Rambha Road", "Old GT Road", "Prem Nagar", "Ramesh Nagar"]
+  },
+  {
+    "id": 6,
+    "cities": ["Ambala"],
+    "sector": ["Ambala Cantt", "Ambala City", "Model Town", "Housing Board Colony", "Jagadhri Road", "Baldev Nagar", "Prem Nagar", "Mahesh Nagar", "Gobind Nagar", "Naraingarh Road", "Sadar Bazar", "Vikas Vihar"]
+  }
+]
