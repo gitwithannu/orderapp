@@ -1,9 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
+interface Product {
+  _id: string;
+  product_name: string;
+  variants: any[]; // or define a Variant interface if you want to be fancy
+}
 export default function AdminProductsPage() {
-  const [products, setProducts] = useState([]);
+   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
