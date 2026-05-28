@@ -2,6 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
+interface Variant {
+  type: string;
+  size: string;
+  price: string | number;
+}
 
 export default function EditProductPage() {
   const router = useRouter();
@@ -9,7 +14,7 @@ export default function EditProductPage() {
   const productId = params.id;
 
   const [productName, setProductName] = useState("");
-  const [variants, setVariants] = useState([]);
+  const [variants, setVariants] = useState<Variant[]>([]);
   const [loading, setLoading] = useState(true);
 
   const boxSizes = ["50G", "100G", "200G"];
@@ -30,7 +35,7 @@ export default function EditProductPage() {
       });
   }, [productId]);
 
-  const handleVariantChange = (index, field, value) => {
+  const handleVariantChange = (index: number, field: keyof Variant, value: string) => {
     const updated = [...variants];
     updated[index][field] = value;
 
@@ -45,7 +50,7 @@ export default function EditProductPage() {
     setVariants([...variants, { type: "", size: "", price: "" }]);
   };
 
-  const removeVariant = (index) => {
+  const removeVariant = (index:number) => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
