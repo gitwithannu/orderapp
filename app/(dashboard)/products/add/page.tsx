@@ -2,26 +2,29 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+interface Variant {
+  type: string;
+  size: string;
+  price: string | number;
+}
 
 export default function AddProductPage() {
   const router = useRouter();
 
   const [productName, setProductName] = useState("");
-  const [variants, setVariants] = useState([
-    { type: "", size: "", price: "" },
-  ]);
+ const [variants, setVariants] = useState<Variant[]>([]);
 
   const addVariant = () => {
     setVariants([...variants, { type: "", size: "", price: "" }]);
   };
 
-  const removeVariant = (index) => {
+  const removeVariant = (index:number) => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  const handleVariantChange = (index, field, value) => {
+  const handleVariantChange =(index: number, field: keyof Variant, value: string) => {
     const updated = [...variants];
-    updated[index][field] = value;
+    (updated[index] as any)[field] = value;
 
     // Auto-fill size options based on type
     if (field === "type") {
