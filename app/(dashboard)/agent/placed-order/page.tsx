@@ -3,18 +3,37 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+interface Variant {
+  type: string;
+  size: string;
+  price: number;
+}
+
+interface Product {
+  _id: string;
+  product_name: string;
+  variants: Variant[];
+}
+
+interface OrderItem {
+  product: string;
+  variantType: string;
+  variantSize: string;
+  quantity: number;
+  price: number;
+}
 export default function CreateOrderPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const storeId = searchParams.get("storeId");
 
   const [store, setStore] = useState<any>(null);
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
 
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
-  const [items, setItems] = useState([
+const [items, setItems] = useState<OrderItem[]>([
     { product: "", variantType: "", variantSize: "", quantity: 1, price: 0 },
   ]);
 
@@ -45,9 +64,9 @@ export default function CreateOrderPage() {
   }, []);
 
   // ⭐ Handle item changes
-  const handleItemChange = (index, field, value) => {
+  const handleItemChange = (index: number, field: keyof OrderItem, value: any) => {
     const updated = [...items];
-    updated[index][field] = value;
+   (updated[index] as any)[field] = value;
 
     const product = products.find((p) => p._id === updated[index].product);
 
@@ -81,7 +100,7 @@ export default function CreateOrderPage() {
     ]);
   };
 
-  const removeItem = (index) => {
+  const removeItem = (index: number) => {
     setItems(items.filter((_, i) => i !== index));
   };
 
