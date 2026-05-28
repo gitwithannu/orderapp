@@ -1,8 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
+interface User {
+  permissions: string[];
+  name?: string;
+  email?: string;
+}
 
 export default function AdminOrders() {
-    const [user, setUser] = useState(null);
+    const [user, setUser] = useState<User | null>(null);
   
     useEffect(() => {
       fetch("/api/me")
