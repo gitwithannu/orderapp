@@ -67,9 +67,9 @@ export default function StorePage() {
   useEffect(() => {
     let results = stores;
 
-    if (selectedState) results = results.filter((s) => s.state === selectedState);
-    if (selectedCity) results = results.filter((s) => s.city === selectedCity);
-    if (selectedSector) results = results.filter((s) => s.sector === selectedSector);
+    if (selectedState) results = results.filter((s:any) => s.state === selectedState);
+    if (selectedCity) results = results.filter((s:any) => s.city === selectedCity);
+    if (selectedSector) results = results.filter((s:any) => s.sector === selectedSector);
 
     if (search) {
       const query = search.toLowerCase();
@@ -115,7 +115,7 @@ export default function StorePage() {
               }`}
             >
               <option value="">All States</option>
-              {states.map((s) => (
+              {states.map((s:any) => (
                 <option key={s.id} value={s.name}>
                   {s.name}
                 </option>
@@ -196,7 +196,7 @@ export default function StorePage() {
             </thead>
 
             <tbody>
-              {currentStores.map((store) => (
+              {currentStores.map((store:any) => (
                 <tr key={store._id} className="hover:bg-gray-50">
                   <td className="border p-2">{store.storeName}</td>
                   <td className="border p-2">{store.ownerName}</td>
