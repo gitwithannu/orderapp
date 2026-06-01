@@ -26,18 +26,39 @@ export default function RegisterStore() {
   
 
   useEffect(() => {
-    if (user?.role === "agent") {
+    if (!user) return;
+
+    if (user.role === "agent") {
       setSelectedState(user.state || "");
       setSelectedCity(user.city || "");
+    } else if (user.role === "superadmin") {
+      fetch("/api/states")
+        .then((res) => res.json())
+        .then((data) => setStates(data))
+        .catch((err) => console.error("Error fetching states:", err));
     }
-  }, [user]);
+  }, []);
 
  /*  useEffect(() => {
     fetch("/api/states")
       .then(res => res.json())
       .then(data => setStates(data));      
   }, []); */
+// 2. ONLY for Superadmin: Fetch cities when a state changes
+  useEffect(() => {
+    // If there is no state selected, or if the user is an agent (since their city is fixed), don't fetch
+    if (!selectedState || user?.role === "agent") return;
 
+    fetch("/api/cities/" + selectedState)
+      .then((res) => res.json())
+      .then((data) => setCities(data))
+      .catch((err) => console.error("Error fetching cities:", err));
+
+    // Reset downstream selections when state changes
+    setSectors([]);
+    setSelectedSector("");
+    setSelectedCity("");
+  }, [selectedState]);
 
   /* useEffect(() => {
     console.log('state changes');
@@ -110,8 +131,8 @@ export default function RegisterStore() {
     <div className="min-h-screen flex flex-col items-start justify-start bg-gray-100 p-8 pt-12">
      {!storeform && (
       <div className="min-h-screen bg-gray-100 p-8 pt-12">
-        <div id="select_state">
-        
+        {user?.role === "agent" ? (
+        <div id="select_state">     
           <div className="flex gap-3">
              <h1> Select the State </h1> : 
              <div  className={`px-3 py-1 rounded-full border transition 
@@ -119,9 +140,28 @@ export default function RegisterStore() {
               > {selectedState} </div>
           </div>
         </div>
-        
+        ): (
+        <div id="select_state">
+          <h1> Select the State </h1>
+          <div className="flex gap-3">
+            {states.map((s: any) => (
+              <button
+                key={s.id}
+                onClick={() => setSelectedState(s.name)}
+                className={`px-5 py-2 rounded-full border transition 
+                  ${selectedState === s.name 
+                    ? "bg-blue-600 text-white border-blue-700" 
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"}`}
+              >
+                {s.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        )}
+         {user?.role === "agent" ? (
         <div id="select_city">
-          
           <div className="flex gap-3">
            <h1> Select the City </h1> : 
             <div  className={`px-3 py-1 rounded-full border transition 
@@ -132,6 +172,27 @@ export default function RegisterStore() {
 
           </div>
         </div>
+         ):(
+        <div id="select_city">
+          <h1> Select the City </h1>
+          <div className="flex gap-3">
+            {cities.map((city: string, index: number) => (
+              <button
+                key={index}
+                onClick={() => setSelectedCity(city)}
+                className={`px-5 py-2 rounded-full border transition 
+                  ${selectedcity === city 
+                    ? "bg-blue-600 text-white border-blue-700" 
+                    : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"}`}
+              >
+                {city}
+              </button>
+            ))}
+
+          </div>
+        </div>
+
+         )}
 
       <div id="select_sector">
         <h1>Select the Sector / Area</h1>
