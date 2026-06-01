@@ -1,150 +1,133 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react"; // 1. Added Suspense here
 import { useRouter, useSearchParams } from "next/navigation";
 
-interface Variant {
-  type: string;
-  size: string;
-  price: number;
-}
+// --- Keep your interfaces exactly the same ---
+interface Variant { type: string; size: string; price: number; }
+interface Product { _id: string; product_name: string; variants: Variant[]; }
+interface OrderItem { product: string; variantType: string; variantSize: string; quantity: number; price: number; }
 
-interface Product {
-  _id: string;
-  product_name: string;
-  variants: Variant[];
-}
-
-interface OrderItem {
-  product: string;
-  variantType: string;
-  variantSize: string;
-  quantity: number;
-  price: number;
-}
-export default function CreateOrderPage() {
+// 2. Rename your main function to "OrderForm"
+function OrderForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // This is the line that causes the error
   const storeId = searchParams.get("storeId");
 
   const [store, setStore] = useState<any>(null);
   const [products, setProducts] = useState<Product[]>([]);
-
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-
-const [items, setItems] = useState<OrderItem[]>([
+  const [items, setItems] = useState<OrderItem[]>([
     { product: "", variantType: "", variantSize: "", quantity: 1, price: 0 },
   ]);
-
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // ⭐ Fetch store details
-  useEffect(() => {
-    if (!storeId) return;
-
-    fetch(`/api/stores/${storeId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setStore(data);
-        setCustomerName(data.ownerName);
-        setCustomerPhone(data.ownerMobile);
-        setLoading(false);
+  // ... [PASTE ALL YOUR USEEFFECTS AND HANDLER FUNCTIONS HERE] ...
+  // (Keep handleItemChange, addItem, removeItem, handleSubmit, etc.)
+   // ⭐ Fetch store details
+    useEffect(() => {
+      if (!storeId) return;
+  
+      fetch(`/api/stores/${storeId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setStore(data);
+          setCustomerName(data.ownerName);
+          setCustomerPhone(data.ownerMobile);
+          setLoading(false);
+        });
+    }, [storeId]);
+  
+    // ⭐ Fetch products
+    useEffect(() => {
+      fetch("/api/products")
+        .then((res) => res.json())
+        .then((data) =>
+          setProducts(Array.isArray(data) ? data : data.products || [])
+        );
+    }, []);
+  
+    // ⭐ Handle item changes
+    const handleItemChange = (index: number, field: keyof OrderItem, value: any) => {
+      const updated = [...items];
+     (updated[index] as any)[field] = value;
+  
+      const product = products.find((p) => p._id === updated[index].product);
+  
+      if (field === "product") {
+        updated[index].variantType = "";
+        updated[index].variantSize = "";
+        updated[index].price = 0;
+      }
+  
+      if (field === "variantType") {
+        updated[index].variantSize = "";
+        updated[index].price = 0;
+      }
+  
+      if (field === "variantSize") {
+        const variant = product?.variants.find(
+          (v) =>
+            v.type === updated[index].variantType &&
+            v.size === updated[index].variantSize
+        );
+        updated[index].price = variant?.price || 0;
+      }
+  
+      setItems(updated);
+    };
+  
+    const addItem = () => {
+      setItems([
+        ...items,
+        { product: "", variantType: "", variantSize: "", quantity: 1, price: 0 },
+      ]);
+    };
+  
+    const removeItem = (index: number) => {
+      setItems(items.filter((_, i) => i !== index));
+    };
+  
+    const totalAmount = items.reduce(
+      (sum, item) => sum + item.quantity * item.price,
+      0
+    );
+  
+    // ⭐ Submit order
+    const handleSubmit = async () => {
+      if (!store) return;
+  
+      setLoading(true);
+  
+      const res = await fetch("/api/agent/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          store: store._id,
+          customerName,
+          customerPhone,
+          items,
+          notes,
+          totalAmount,
+        }),
       });
-  }, [storeId]);
-
-  // ⭐ Fetch products
-  useEffect(() => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) =>
-        setProducts(Array.isArray(data) ? data : data.products || [])
-      );
-  }, []);
-
-  // ⭐ Handle item changes
-  const handleItemChange = (index: number, field: keyof OrderItem, value: any) => {
-    const updated = [...items];
-   (updated[index] as any)[field] = value;
-
-    const product = products.find((p) => p._id === updated[index].product);
-
-    if (field === "product") {
-      updated[index].variantType = "";
-      updated[index].variantSize = "";
-      updated[index].price = 0;
-    }
-
-    if (field === "variantType") {
-      updated[index].variantSize = "";
-      updated[index].price = 0;
-    }
-
-    if (field === "variantSize") {
-      const variant = product?.variants.find(
-        (v) =>
-          v.type === updated[index].variantType &&
-          v.size === updated[index].variantSize
-      );
-      updated[index].price = variant?.price || 0;
-    }
-
-    setItems(updated);
-  };
-
-  const addItem = () => {
-    setItems([
-      ...items,
-      { product: "", variantType: "", variantSize: "", quantity: 1, price: 0 },
-    ]);
-  };
-
-  const removeItem = (index: number) => {
-    setItems(items.filter((_, i) => i !== index));
-  };
-
-  const totalAmount = items.reduce(
-    (sum, item) => sum + item.quantity * item.price,
-    0
-  );
-
-  // ⭐ Submit order
-  const handleSubmit = async () => {
-    if (!store) return;
-
-    setLoading(true);
-
-    const res = await fetch("/api/agent/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        store: store._id,
-        customerName,
-        customerPhone,
-        items,
-        notes,
-        totalAmount,
-      }),
-    });
-
-    setLoading(false);
-
-    if (res.ok) {
-      router.push("/agent/orders?success=1");
-    }
-  };
+  
+      setLoading(false);
+  
+      if (res.ok) {
+        router.push("/agent/orders?success=1");
+      }
+    };
 
   if (loading || !store) {
-    return (
-      <div className="p-8 text-center text-gray-600">
-        Loading store details...
-      </div>
-    );
+    return <div className="p-8 text-center text-gray-600">Loading store details...</div>;
   }
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
+          <div className="p-8 bg-gray-50 min-h-screen">
       <div className="max-w-3xl mx-auto bg-white shadow rounded p-8">
         <h1 className="text-3xl font-bold mb-6">Create Order</h1>
 
@@ -326,5 +309,16 @@ const [items, setItems] = useState<OrderItem[]>([
         </button>
       </div>
     </div>
+  );
+    </div>
+  );
+}
+
+// 3. This is the NEW DEFAULT EXPORT that fixes the build error
+export default function CreateOrderPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center">Loading interface...</div>}>
+      <OrderForm />
+    </Suspense>
   );
 }
