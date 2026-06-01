@@ -7,8 +7,8 @@ interface User {
   email?: string;
 }
   export default function AgentDashboard() {
-    const [user, setUser] = useState<User | null>(null);
-    
+      const [user, setUser] = useState<User | null>(null);
+       
       useEffect(() => {
         fetch("/api/me")
           .then((res) => res.json())
@@ -37,7 +37,7 @@ interface User {
           <div className="bg-white shadow rounded p-6">
             <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
 
-            {user.permissions.includes("create_order") && (
+            {user?.permissions?.includes("create_order") && (
               <a
                 href="/agent/create-order"
                 className="block bg-blue-600 text-white text-center py-3 rounded mb-3"
@@ -46,7 +46,7 @@ interface User {
               </a>
             )}
 
-            {user.permissions.includes("view_own_orders") && (
+            {user?.permissions?.includes("view_own_orders") && (
               <a
                 href="/agent/orders"
                 className="block bg-gray-700 text-white text-center py-3 rounded"
