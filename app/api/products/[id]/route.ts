@@ -1,9 +1,23 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
-import jwt from "jsonwebtoken";
+import jwt , { JwtPayload }from "jsonwebtoken";
 
-export async function GET(req, context) {
+// Define the context type for dynamic routes
+type Context = {
+ params: Promise<{ id: string }>;
+};
+interface MyToken {
+    permissions: string[];
+    // add userId: string, etc., if you have them
+  }
+
+// Define the structure of your JWT data
+interface CustomJwtPayload extends JwtPayload {
+  permissions: string[];
+}  
+
+export async function GET(_req: NextRequest, context: Context) {
   await connectDB();
 
   const { id } = await context.params; // Next.js 14 fix
@@ -12,7 +26,7 @@ export async function GET(req, context) {
   return NextResponse.json({ product });
 }
 
-export async function PUT(req, context) {
+export async function PUT(req: NextRequest, context: Context) {
   await connectDB();
 
   const { id } = await context.params; // Next.js 14 fix
@@ -27,9 +41,9 @@ export async function PUT(req, context) {
   }
 
   // Decode JWT
-  let decoded;
+  let decoded: MyToken;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    decoded = jwt.verify(token, process.env.JWT_SECRET as string) as any ;
   } catch (err) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
@@ -55,7 +69,7 @@ export async function PUT(req, context) {
   });
 }
 
-export async function DELETE(req, context) {
+export async function DELETE(req: NextRequest, context: Context) {
   await connectDB();
 
   const { id } = await context.params;
@@ -71,7 +85,7 @@ export async function DELETE(req, context) {
   // Decode JWT
   let decoded;
   try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
+    decoded = jwt.verify(token, process.env.JWT_SECRET as string) as CustomJwtPayload;
   } catch (err) {
     return NextResponse.json({ error: "Invalid token" }, { status: 401 });
   }
