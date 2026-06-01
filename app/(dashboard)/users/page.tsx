@@ -11,7 +11,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<keyof User>("name");
   const [sortOrder, setSortOrder] = useState("asc");
-  const [openModal, setOpenModal] = useState(false);           // ✅ ONLY ONE STATE
+  const [openModal, setOpenModal] = useState(false);          
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -29,13 +29,14 @@ export default function UsersPage() {
         .includes(search.toLowerCase())
     )
     .sort((a, b) => {
-      const fieldA = a[sortField]?.toString().toLowerCase();
-      const fieldB = b[sortField]?.toString().toLowerCase();
+      const fieldA = (a[sortField]?.toString()|| "").toLowerCase();
+      const fieldB = (b[sortField]?.toString()|| "").toLowerCase();
 
       if (fieldA < fieldB) return sortOrder === "asc" ? -1 : 1;
       if (fieldA > fieldB) return sortOrder === "asc" ? 1 : -1;
       return 0;
     });
+
     const refreshUsers = () => {
   fetch("/api/users")
     .then((res) => res.json())
