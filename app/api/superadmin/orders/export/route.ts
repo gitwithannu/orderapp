@@ -42,7 +42,7 @@ export async function GET(req: Request) {
   for (const order of orders) {
     const items = order.items
       .map(
-        (i) =>
+        (i:any) =>
           `${i.productName} (x${i.quantity}) - ₹${(
             i.price * i.quantity
           ).toFixed(2)}`
