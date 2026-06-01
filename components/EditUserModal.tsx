@@ -65,7 +65,7 @@ export default function EditUserModal({
           name="role"
           className="w-full border p-3 rounded mb-4"
           value={form.role}
-          onChange={(e) => setForm({ ...form, role: e.target.value })}
+          onChange={(e) => setForm({ ...form, role: e.target.value as "agent" | "admin" | "market" | "superadmin" })}
         >
           <option value="agent">Agent</option>
           <option value="admin">Admin</option>
