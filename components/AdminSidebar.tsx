@@ -50,6 +50,12 @@ export default function Sidebar() {
           permission: "create_order",
         },
         {
+          label: "Create Store",
+          href: "/agent/create-store",
+          icon: <FiFileText size={18} />,
+          permission: "create_store",
+        },
+        {
           label: "All Orders",
           href: "/orders",
           icon: <FiFileText size={18} />,
