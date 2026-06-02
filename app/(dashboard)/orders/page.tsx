@@ -14,6 +14,15 @@ export default function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
+  const statusStyles: Record<string, string> = {
+    pending: "bg-amber-100 text-amber-800 border-amber-200",
+    confirmed: "bg-blue-100 text-blue-800 border-blue-200",
+    packed: "bg-purple-100 text-purple-800 border-purple-200",
+    shipped: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    delivered: "bg-green-100 text-green-800 border-green-200",
+    cancelled: "bg-rose-100 text-rose-800 border-rose-200",
+  };
+
   const fetchOrders = () => {
     const params = new URLSearchParams();
     params.set("page", String(page));
@@ -144,7 +153,7 @@ export default function OrdersPage() {
                         ₹ {order.totalAmount.toFixed(2)}
                       </td>
                       <td className="p-3">
-                        <span className="px-2 py-1 rounded text-xs font-medium capitalize bg-gray-100">
+                        <span className={`px-2.5 py-1 rounded-md text-xs font-medium border capitalize ${statusStyles[order.status.toLowerCase()] || "bg-gray-100 text-gray-800 border-gray-200"}`}>
                           {order.status}
                         </span>
                       </td>
