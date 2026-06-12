@@ -1,7 +1,7 @@
 "use client";
 
 import type { IOrder } from "@/models/Order";
-import { Package, Layers, ClipboardList } from "lucide-react";
+import { Package, Layers, ClipboardList, MessageSquare } from "lucide-react";
 
 // Use an object map for cleaner icon logic
 const typeIcons: Record<string, React.ReactNode> = {
@@ -65,6 +65,23 @@ export default function OrderDetailsModal({
           </div>
         </div>
 
+        {/* ⭐ HIGHLIGHTED: Order Notes Section */}
+        <div className="mb-6 border-t pt-4">
+          <div className="flex items-center gap-2 text-amber-800 mb-2">
+            <MessageSquare size={18} className="text-amber-600" />
+            <p className="font-bold text-sm uppercase tracking-wide">
+              Order Notes / Voice Dictation
+            </p>
+          </div>
+          <div className="bg-amber-50/60 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm text-gray-800 text-base font-medium whitespace-pre-wrap italic">
+            {order.notes && order.notes.trim() !== "" ? (
+              <span>"{order.notes}"</span>
+            ) : (
+              <span className="text-gray-400 font-normal">No instructions or voice notes left for this order.</span>
+            )}
+          </div>
+        </div>
+
         <h3 className="font-semibold mb-2 border-t pt-4">Items</h3>
         <table className="w-full text-sm mb-4 border-collapse">
           <thead>
@@ -75,6 +92,7 @@ export default function OrderDetailsModal({
               <th className="p-2 text-right">Qty</th>
               <th className="p-2 text-right">Price</th>
               <th className="p-2 text-right">Total</th>
+              <th className="p-2 text-right">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -99,7 +117,9 @@ export default function OrderDetailsModal({
                 <td className="p-2 text-right font-semibold">
                   ₹{(item.price * item.quantity).toFixed(2)}
                 </td>
+                <td> {order.note }</td>
               </tr>
+              
             ))}
           </tbody>
         </table>
