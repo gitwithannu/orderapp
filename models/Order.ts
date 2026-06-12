@@ -29,6 +29,8 @@ items: Array<{
   }>;
   status: string;
   totalAmount: number;
+  notes?: string;      
+  feedback?: string;   
   createdAt: string;
   
 }
@@ -72,6 +74,16 @@ const OrderSchema = new Schema<IOrder>(
         price: Number,
       },
     ],
+      notes: {
+        type: String,
+        default: "",
+      },
+
+     
+      feedback: {
+        type: String,
+        default: "",
+      },
   },
   { timestamps: true }
 );
