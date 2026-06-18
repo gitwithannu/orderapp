@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import PermissionGate from "@/components/PermissionGate";
+import VisitLogsModal from "@/components/VisitLogsModal"; // Import your new component
 
 export default function InactiveStoresOrdersPage() {
-  // Fix missing state hooks variables from draft
   const [stores, setStores] = useState([]);
   const [timeFilter, setTimeFilter] = useState("2_weeks");
   const [search, setSearch] = useState("");
@@ -12,6 +12,10 @@ export default function InactiveStoresOrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<any>(null);
+
+  // --- Modal Control State variables ---
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<{ id: string; name: string } | null>(null);
 
   const limit = 10;
 
@@ -28,7 +32,6 @@ export default function InactiveStoresOrdersPage() {
       const result = await response.json();
 
       if (result.success) {
-        // Simple manual frontend page chunking logic
         const data = result.stores || [];
         setTotalPages(Math.ceil(data.length / limit) || 1);
         
@@ -45,15 +48,19 @@ export default function InactiveStoresOrdersPage() {
     }
   };
 
-  // Re-run anytime page or time scope shifts
   useEffect(() => {
     fetchInactiveStores();
   }, [page, timeFilter]);
 
+  // Handler to safely mount and trigger the popup window definitions
+  const handleOpenReasons = (storeId: string, storeName: string) => {
+    setSelectedStore({ id: storeId, name: storeName });
+    setIsModalOpen(true);
+  };
+
   return (
     <PermissionGate permission="view_all_orders">
       <div className="p-8 bg-gray-50 min-h-screen">
-        {/* Loading Spinner Overlay */}
         {isLoading && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
             <div className="bg-white p-5 rounded-xl shadow-xl flex flex-col items-center gap-3">
@@ -68,8 +75,6 @@ export default function InactiveStoresOrdersPage() {
           </h1>
 
           <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
-            
-            {/* --- TIME FILTER DROPDOWN --- */}
             <div className="flex flex-col gap-1 w-full sm:w-64">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-1">
                 Filter by Inactivity Period
@@ -90,25 +95,25 @@ export default function InactiveStoresOrdersPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 items-center w-full md:w-auto mt-4">
-             <input
-              type="text"
-              placeholder="Search by store name, city, state..."
-              className="border p-3 rounded w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setPage(1);
-                  fetchInactiveStores();
-                }
-              }}
-            />
-             <button 
-               onClick={() => { setPage(1); fetchInactiveStores(); }}
-               className="bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 font-medium transition"
-             >
-               Search
-             </button>
+              <input
+                type="text"
+                placeholder="Search by store name, city, state..."
+                className="border p-3 rounded w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setPage(1);
+                    fetchInactiveStores();
+                  }
+                }}
+              />
+              <button 
+                onClick={() => { setPage(1); fetchInactiveStores(); }}
+                className="bg-blue-600 text-white px-5 py-3 rounded-md hover:bg-blue-700 font-medium transition"
+              >
+                Search
+              </button>
             </div>
           </div>
 
@@ -123,6 +128,8 @@ export default function InactiveStoresOrdersPage() {
                   <th className="p-3">City</th>
                   <th className="p-3">State</th>
                   <th className="p-3">Status Label</th>
+                  {/* --- NEW COLUMN HEADER --- */}
+                  <th className="p-3">Reason</th>
                   <th className="p-3">Actions</th>
                 </tr>
               </thead>
@@ -138,6 +145,15 @@ export default function InactiveStoresOrdersPage() {
                         <span className="px-2.5 py-1 rounded-md text-xs font-medium border bg-rose-100 text-rose-800 border-rose-200">
                           No orders ({timeFilter.replace("_", " ")})
                         </span>
+                      </td>
+                      {/* --- NEW COLUMN REASON ACTION BUTTON --- */}
+                      <td className="p-3">
+                        <button
+                          onClick={() => handleOpenReasons(store._id, store.storeName || "Unnamed Store")}
+                          className="px-2.5 py-1 border border-blue-200 bg-blue-50 text-blue-700 rounded-md text-xs font-semibold hover:bg-blue-100 transition shadow-sm"
+                        >
+                          View Reasons
+                        </button>
                       </td>
                       <td className="p-3">
                         <button
@@ -156,7 +172,7 @@ export default function InactiveStoresOrdersPage() {
                   ))
                ) : (
                   <tr>
-                    <td className="p-6 text-center text-gray-500" colSpan={6}>
+                    <td className="p-6 text-center text-gray-500" colSpan={7}>
                       No completely inactive stores found matching criteria.
                     </td>
                   </tr>
@@ -165,7 +181,6 @@ export default function InactiveStoresOrdersPage() {
             </table>
           </div>
 
-          {/* Pagination Navigation */}
           <div className="flex justify-center gap-4 mt-6">
             <button
               disabled={page === 1}
@@ -187,7 +202,17 @@ export default function InactiveStoresOrdersPage() {
           </div>
         </div>
       </div>
+
+      {/* --- RENDER LOG DETAILS MODAL DIALOG --- */}
+      <VisitLogsModal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedStore(null);
+        }}
+        storeId={selectedStore?.id || ""}
+        storeName={selectedStore?.name || ""}
+      />
     </PermissionGate>
   );
-  
 }
