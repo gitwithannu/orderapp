@@ -67,9 +67,9 @@ export default function StorePage() {
   useEffect(() => {
     let results = stores;
 
-    if (selectedState) results = results.filter((s:any) => s.state === selectedState);
-    if (selectedCity) results = results.filter((s:any) => s.city === selectedCity);
-    if (selectedSector) results = results.filter((s:any) => s.sector === selectedSector);
+    if (selectedState) results = results.filter((s: any) => s.state === selectedState);
+    if (selectedCity) results = results.filter((s: any) => s.city === selectedCity);
+    if (selectedSector) results = results.filter((s: any) => s.sector === selectedSector);
 
     if (search) {
       const query = search.toLowerCase();
@@ -115,7 +115,7 @@ export default function StorePage() {
               }`}
             >
               <option value="">All States</option>
-              {states.map((s:any) => (
+              {states.map((s: any) => (
                 <option key={s.id} value={s.name}>
                   {s.name}
                 </option>
@@ -196,7 +196,7 @@ export default function StorePage() {
             </thead>
 
             <tbody>
-              {currentStores.map((store:any) => (
+              {currentStores.map((store: any) => (
                 <tr key={store._id} className="hover:bg-gray-50">
                   <td className="border p-2">{store.storeName}</td>
                   <td className="border p-2">{store.ownerName}</td>
@@ -219,6 +219,15 @@ export default function StorePage() {
                     >
                       New Way Place Order
                     </Link>
+                    |
+                    <Link
+                      href={`/agent/store-visit?storeId=${store._id}`}
+                      className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                    >
+                     Visit Store
+                    </Link>
+
+                    
                   </td>
                 </tr>
               ))}
