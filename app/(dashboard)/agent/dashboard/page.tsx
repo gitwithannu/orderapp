@@ -49,11 +49,21 @@ interface User {
             {user?.permissions?.includes("view_own_orders") && (
               <a
                 href="/agent/orders"
-                className="block bg-gray-700 text-white text-center py-3 rounded"
+                className="block bg-gray-700 text-white text-center py-3 rounded mb-3"
               >
                 View My Orders
               </a>
+
             )}
+
+            {user?.permissions?.includes("view_own_orders") && (
+             <a
+                href="/agent/create-store"
+                className="block bg-sky-500 text-white text-center py-3 rounded"
+              >
+               Create store
+              </a>
+                 )} 
           </div>
         </div>
       </div>
