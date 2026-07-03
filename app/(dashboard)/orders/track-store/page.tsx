@@ -60,7 +60,7 @@ export default function InactiveStoresOrdersPage() {
 
   return (
     <PermissionGate permission="view_all_orders">
-      <div className="p-8 bg-gray-50 min-h-screen">
+      <div className="p-8 bg-gray-50 min-h-[100dvh] flex flex-col">
         {isLoading && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
             <div className="bg-white p-5 rounded-xl shadow-xl flex flex-col items-center gap-3">
