@@ -14,24 +14,33 @@ import {
 } from "react-icons/fi";
 
 // Create an isolated sub-menu rendering component
-function SidebarItem({ item, userPermissions, pathname }: { item: any; userPermissions: string[]; pathname: string }) {
+function SidebarItem({
+  item,
+  userPermissions,
+  pathname,
+}: {
+  item: any;
+  userPermissions: string[];
+  pathname: string;
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // 1. Permission Guard
+  // Permission Guard
   if (item.permission && !userPermissions.includes(item.permission)) {
     return null;
   }
 
   const hasChildren = item.children && item.children.length > 0;
   const isActive = pathname === item.href;
-  
-  // Auto-open menu if a child path is currently active
-  const isChildActive = hasChildren && item.children.some((child: any) => pathname === child.href);
-  
-  // Use a quick hook rule effect to initialize open states on page refresh
+
+  const isChildActive =
+    hasChildren && item.children.some((child: any) => pathname === child.href);
+
   useEffect(() => {
     if (isChildActive) setIsOpen(true);
   }, [isChildActive]);
+
+  const isOrdersMenu = item.label === "Orders";
 
   if (hasChildren) {
     return (
@@ -47,10 +56,20 @@ function SidebarItem({ item, userPermissions, pathname }: { item: any; userPermi
           <div className="flex items-center gap-3">
             {item.icon}
             <span>{item.label}</span>
+
+            {/* 🟢 TODAY ORDER COUNT BADGE */}
+            {isOrdersMenu && (
+              <span className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
+                {item.todayCount}
+              </span>
+            )}
           </div>
+
           <FiChevronDown
             size={16}
-            className={`transform transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+            className={`transform transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
           />
         </button>
 
@@ -58,7 +77,10 @@ function SidebarItem({ item, userPermissions, pathname }: { item: any; userPermi
         {isOpen && (
           <div className="mt-1 pl-6 flex flex-col gap-1 border-l border-gray-700 ml-5">
             {item.children.map((child: any) => {
-              if (child.permission && !userPermissions.includes(child.permission)) {
+              if (
+                child.permission &&
+                !userPermissions.includes(child.permission)
+              ) {
                 return null;
               }
 
@@ -70,13 +92,25 @@ function SidebarItem({ item, userPermissions, pathname }: { item: any; userPermi
                   href={child.href}
                   className={`
                     flex items-center gap-3 p-2 rounded text-sm transition relative
-                    ${isChildCurrent ? "text-blue-400 font-medium" : "text-gray-400 hover:text-white hover:bg-gray-800"}
+                    ${
+                      isChildCurrent
+                        ? "text-blue-400 font-medium"
+                        : "text-gray-400 hover:text-white hover:bg-gray-800"
+                    }
                   `}
                 >
                   {isChildCurrent && (
                     <span className="absolute -left-6 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-blue-500"></span>
                   )}
+
                   <span>{child.label}</span>
+
+                  {/* 🔴 PENDING ORDER COUNT BADGE */}
+                  {child.pendingCount > 0 && (
+                    <span className="ml-auto bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
+                      {child.pendingCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -108,6 +142,34 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
+
+  const [pendingCount, setPendingCount] = useState(0);
+  const [todayCount, setTodayCount] = useState(0);
+
+  async function loadCounts() {
+    try {
+      const pendingRes = await fetch("/api/superadmin/orders/pending-count");
+      const todayRes = await fetch("/api/superadmin/orders/today-count");
+
+      const pendingData = await pendingRes.json();
+      const todayData = await todayRes.json();
+
+      setPendingCount(pendingData.count);
+      setTodayCount(todayData.count);
+    } catch (e) {
+      console.log("Error fetching counts", e);
+    }
+  }
+
+  useEffect(() => {
+    loadCounts();
+
+    const interval = setInterval(() => {
+      loadCounts();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     fetch("/api/me")
@@ -145,17 +207,18 @@ export default function Sidebar() {
           href: "/orders",
           icon: <FiFileText size={18} />,
           permission: "view_all_orders",
-          // --- NEW SUB-MENU CHILDREN CONFIGURED HERE ---
+          todayCount, // 🟢 parent badge
           children: [
             {
               label: "All Order",
               href: "/orders",
-              permission: "view_all_orders", // Uses same view permission or specify a distinct one
+              permission: "view_all_orders",
+              pendingCount, // 🔴 child badge
             },
             {
               label: "Track Store",
               href: "/orders/track-store",
-              permission: "view_all_orders", // Uses same view permission or specify a distinct one
+              permission: "view_all_orders",
             },
             {
               label: "Monitor Agents",
@@ -250,10 +313,10 @@ export default function Sidebar() {
 
             <div className="flex flex-col gap-1">
               {section.items.map((item) => (
-                <SidebarItem 
-                  key={item.label + item.href} 
-                  item={item} 
-                  userPermissions={userPermissions} 
+                <SidebarItem
+                  key={item.label + item.href}
+                  item={item}
+                  userPermissions={userPermissions}
                   pathname={pathname}
                 />
               ))}
