@@ -48,7 +48,7 @@ export default function VisitLogsModal({ isOpen, onClose, storeId, storeName }: 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-start justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-white w-full max-w-xl rounded-xl shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[85vh]">
         
         {/* Modal Header */}
