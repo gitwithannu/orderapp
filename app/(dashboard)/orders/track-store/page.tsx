@@ -69,7 +69,7 @@ export default function InactiveStoresOrdersPage() {
             </div>
           </div>
         )}
-        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-8">
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-8 flex-grow">
           <h1 className="text-3xl font-bold mb-6 text-gray-800">
             Stores With No Recent Orders
           </h1>
