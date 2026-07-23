@@ -61,9 +61,9 @@ const canDelete = permissions.includes("manage_products");
 
   return (
     <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="md:text-3xl font-bold mb-6 text-gray-800">Products</h1>
+      <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6">
+          <h1 className="md:text-3xl font-bold mb-2 sm:mb-6 text-gray-800">Products</h1>
 
           {canAdd && (
             <Link
