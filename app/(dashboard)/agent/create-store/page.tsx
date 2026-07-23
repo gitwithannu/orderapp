@@ -128,12 +128,12 @@ export default function RegisterStore() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-start justify-start bg-gray-100 p-8 pt-12">
+    <div className="p-1 sm:p-8 min-h-screen flex flex-col items-start justify-start bg-gray-100 pt-12">
      {!storeform && (
-      <div className="min-h-screen bg-gray-100 p-8 pt-12">
+      <div className="p-1 sm:p-8 min-h-screen bg-gray-100 pt-12">
         {user?.role === "agent" ? (
-        <div id="select_state">     
-          <div className="flex gap-3">
+        <div id="select_state"className="pt-2">     
+          <div className="flex flex-wrap gap-3">
              <h1> Select the State </h1> : 
              <div  className={`px-3 py-1 rounded-full border transition 
                    bg-blue-600 text-white border-blue-700 mb-2`}
@@ -141,9 +141,9 @@ export default function RegisterStore() {
           </div>
         </div>
         ): (
-        <div id="select_state">
+        <div id="select_state"className="pt-2">
           <h1> Select the State </h1>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             {states.map((s: any) => (
               <button
                 key={s.id}
@@ -161,8 +161,8 @@ export default function RegisterStore() {
 
         )}
          {user?.role === "agent" ? (
-        <div id="select_city">
-          <div className="flex gap-3">
+        <div id="select_city"className="pt-2">
+          <div className="flex flex-wrap gap-3">
            <h1> Select the City </h1> : 
             <div  className={`px-3 py-1 rounded-full border transition 
                    bg-blue-600 text-white border-blue-700 mb-2`}
@@ -173,9 +173,9 @@ export default function RegisterStore() {
           </div>
         </div>
          ):(
-        <div id="select_city">
+        <div id="select_city" className="pt-2">
           <h1> Select the City </h1>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             {cities.map((city: string, index: number) => (
               <button
                 key={index}
@@ -194,7 +194,7 @@ export default function RegisterStore() {
 
          )}
 
-      <div id="select_sector">
+      <div id="select_sector"className="pt-2">
         <h1>Select the Sector / Area</h1>
 
         <div className="flex gap-3 flex-wrap">
