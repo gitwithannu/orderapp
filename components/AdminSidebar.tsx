@@ -67,7 +67,7 @@ function SidebarItem({item,userPermissions, pathname,isPinned,isMobile
                   {isChildCurrent && (
                     <span className="absolute -left-6 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-blue-500"></span>
                   )}
-                  {(!isMobile && isPinned) && <span>{item.label}</span>}
+                  {(!isMobile && isPinned) && <span>{child.label}</span>}
                   {/* 🔴 PENDING ORDER COUNT BADGE */}
                   {child.pendingCount > 0 && (
                     <span className="ml-auto bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
