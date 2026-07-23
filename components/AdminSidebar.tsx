@@ -49,7 +49,7 @@ function SidebarItem({
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`
-            w-full flex items-center justify-between p-3 rounded text-left transition text-gray-300 hover:bg-gray-800
+            w-full flex items-center justify-between p-3 rounded text-[10px] md:text-sm text-left transition text-gray-300 hover:bg-gray-800
             ${isChildActive ? "bg-gray-800/50 text-white" : ""}
           `}
         >
@@ -91,7 +91,7 @@ function SidebarItem({
                   key={child.href}
                   href={child.href}
                   className={`
-                    flex items-center gap-3 p-2 rounded text-sm transition relative
+                    flex items-center gap-3 p-2 rounded text-[10px] md:text-sm transition relative
                     ${
                       isChildCurrent
                         ? "text-blue-400 font-medium"
@@ -126,6 +126,7 @@ function SidebarItem({
       href={item.href}
       className={`
         flex items-center gap-3 p-3 rounded relative transition
+        text-[10px] md:text-sm
         ${isActive ? "bg-gray-800 text-white" : "text-gray-300 hover:bg-gray-800"}
       `}
     >
@@ -180,6 +181,7 @@ export default function Sidebar() {
   if (!user) return null;
 
   const userPermissions = user.permissions || [];
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
   const sidebarConfig = [
     {
@@ -188,7 +190,7 @@ export default function Sidebar() {
         {
           label: "Dashboard",
           href: `/${user.role}/dashboard`,
-          icon: <FiHome size={18} />,
+          icon: <FiHome size={isMobile ? 15 : 18} />,
           permission: null,
         },
       ],
@@ -199,13 +201,13 @@ export default function Sidebar() {
         {
           label: "Create Order",
           href: "/agent/create-order",
-          icon: <FiFileText size={18} />,
+          icon: <FiFileText size={isMobile ? 15 : 18} />,
           permission: "create_order",
         },
         {
           label: "Orders",
           href: "/orders",
-          icon: <FiFileText size={18} />,
+          icon: <FiFileText size={isMobile ? 15 : 18} />,
           permission: "view_all_orders",
           todayCount, // 🟢 parent badge
           children: [
@@ -230,7 +232,7 @@ export default function Sidebar() {
         {
           label: "Market Orders",
           href: "/market/orders",
-          icon: <FiFileText size={18} />,
+          icon: <FiFileText size={isMobile ? 15 : 18} />,
           permission: "view_market_orders",
         },
       ],
@@ -241,31 +243,31 @@ export default function Sidebar() {
         {
           label: "Users",
           href: "/users",
-          icon: <FiUsers size={18} />,
+          icon: <FiUsers size={isMobile ? 15 : 18} />,
           permission: "manage_users",
         },
         {
           label: "Create Store",
           href: "/agent/create-store",
-          icon: <FiFileText size={18} />,
+          icon: <FiFileText size={isMobile ? 15 : 18} />,
           permission: "create_store",
         },
         {
           label: "Stores",
           href: "/stores",
-          icon: <FiShoppingBag size={18} />,
+          icon: <FiShoppingBag size={isMobile ? 15 : 18} />,
           permission: "manage_stores",
         },
         {
           label: "Products",
           href: "/products",
-          icon: <FiShoppingBag size={18} />,
+          icon: <FiShoppingBag size={isMobile ? 15 : 18} />,
           permission: "manage_products",
         },
         {
           label: "Markets",
           href: "/superadmin/markets",
-          icon: <FiHome size={18} />,
+          icon: <FiHome size={isMobile ? 15 : 18} />,
           permission: "manage_markets",
         },
       ],
@@ -276,19 +278,19 @@ export default function Sidebar() {
         {
           label: "Invoices",
           href: "/admin/invoices",
-          icon: <FiFileText size={18} />,
+          icon: <FiFileText size={isMobile ? 15 : 18} />,
           permission: "generate_invoice",
         },
         {
           label: "Override Status",
           href: "/superadmin/order-status",
-          icon: <FiSettings size={18} />,
+          icon: <FiSettings size={isMobile ? 15 : 18} />,
           permission: "override_order_status",
         },
         {
           label: "Settings",
           href: "/settings",
-          icon: <FiSettings size={18} />,
+          icon: <FiSettings size={isMobile ? 15 : 18} />,
           permission: null,
         },
       ],
@@ -301,13 +303,13 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 h-screen bg-gray-900 text-white flex flex-col p-4">
-      <h2 className="text-xl font-bold mb-6 capitalize">{user.role} Panel</h2>
+    <aside className="w-35 md:w-64 h-full bg-gray-900 text-white flex flex-col p-2 md:p-4 ">
+      <span className="hidden md:inline">{user.role} Panel</span>
 
       <nav className="flex flex-col gap-6 flex-grow overflow-y-auto">
         {sidebarConfig.map((section) => (
           <div key={section.heading}>
-            <p className="text-xs text-gray-400 font-semibold mb-2 px-2">
+            <p className="text-[9px] md:text-xs text-gray-400 font-semibold mb-2 px-2 md:px-4">
               {section.heading}
             </p>
 
@@ -329,7 +331,7 @@ export default function Sidebar() {
         onClick={handleLogout}
         className="flex items-center gap-3 p-3 rounded text-gray-300 hover:bg-red-600 hover:text-white transition mt-auto"
       >
-        <FiLogOut size={18} />
+        <FiLogOut size={isMobile ? 15 : 18} />
         <span>Logout</span>
       </button>
     </aside>
