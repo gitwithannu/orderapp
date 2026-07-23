@@ -90,7 +90,7 @@ const canDelete = permissions.includes("manage_products");
             <tbody>
               {products.map((p) => (
                 <tr key={p._id}>
-                  <td className="border p-3">{p.product_name}</td>
+                  <td className="border p-3 w-10">{p.product_name}</td>
 
                   <td className="border p-3">
                     {p.variants
