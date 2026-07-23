@@ -74,14 +74,14 @@ export default function StorePage() {
   const currentStores = filteredStores.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-8xl mx-auto bg-white rounded-lg shadow-md p-8">
-            <h1 className="text-3xl font-bold mb-6">Store Directory</h1>
+     <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
+         <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
+            <h1 className="md:text-3xl font-bold mb-6 text-gray-800">Store Directory</h1>
 
             {/* Filters */}
             <div className="flex flex-wrap gap-4 mb-6">
                 {/* State Dropdown */}
-                <div>
+                <div className="w-full sm:w-48">
                 <label className="block mb-1 font-medium">State</label>
                 <select
                     value={selectedState}
@@ -90,7 +90,7 @@ export default function StorePage() {
                     setSelectedCity("");
                     setSelectedSector("");
                     }}
-                    className="border rounded px-3 py-2"
+                    className="border rounded px-3 py-2 w-full"
                 >
                     <option value="">All States</option>
                     {states.map((s: any) => (
@@ -100,7 +100,7 @@ export default function StorePage() {
                 </div>
 
                 {/* City Dropdown */}
-                <div>
+                <div className="w-full sm:w-48">
                 <label className="block mb-1 font-medium">City</label>
                 <select
                     value={selectedCity}
@@ -108,7 +108,7 @@ export default function StorePage() {
                     setSelectedCity(e.target.value);
                     setSelectedSector("");
                     }}
-                    className={`border rounded px-3 py-2 transition 
+                    className={`border rounded px-3 py-2 w-full transition 
                     ${!selectedState 
                         ? "bg-gray-200 text-gray-500 cursor-not-allowed" 
                         : "bg-white text-black cursor-pointer"}`
@@ -123,13 +123,13 @@ export default function StorePage() {
                 </div>
 
                 {/* Sector Dropdown */}
-                <div>
+                <div className="w-full sm:w-48">
                 <label className="block mb-1 font-medium">Sector / Area</label>
                 <select
                     disabled={!selectedCity}
                     value={selectedSector}
                     onChange={(e) => setSelectedSector(e.target.value)}
-                    className={`border rounded px-3 py-2 transition 
+                    className={`border rounded px-3 py-2 w-full transition 
                         ${!selectedCity 
                         ? "bg-gray-200 text-gray-500 cursor-not-allowed" 
                         : "bg-white text-black cursor-pointer"}`
@@ -144,14 +144,14 @@ export default function StorePage() {
                 </div>
 
                 {/* Search */}
-                <div>
+                <div className="w-full sm:w-48">
                 <label className="block mb-1 font-medium">Search</label>
                 <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search store..."
-                    className="border rounded px-3 py-2 w-64"
+                    className="border rounded px-3 py-2 w-full sm:w-64"
                 />
                 </div>
             </div>
