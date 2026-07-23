@@ -60,15 +60,15 @@ const canDelete = permissions.includes("manage_products");
   if (loading) return <div className="p-8 text-center">Loading products...</div>;
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-5xl mx-auto bg-white shadow rounded p-8">
+    <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-5xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Products</h1>
+          <h1 className="md:text-3xl font-bold mb-6 text-gray-800">Products</h1>
 
           {canAdd && (
             <Link
               href="/products/add"
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="p-1 sm:px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
               + Add Product
             </Link>
@@ -78,7 +78,8 @@ const canDelete = permissions.includes("manage_products");
         {products.length === 0 ? (
           <p>No products found.</p>
         ) : (
-          <table className="w-full border-collapse">
+          <div className="w-full overflow-x-auto border rounded-md">
+          <table className="w-full text-left border-collapse min-w-[900px]">
             <thead>
               <tr className="bg-gray-100">
                 <th className="border p-3 text-left">Product Name</th>
@@ -124,6 +125,7 @@ const canDelete = permissions.includes("manage_products");
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </div>
@@ -131,4 +133,3 @@ const canDelete = permissions.includes("manage_products");
 }
 
 // Delete handler
-
