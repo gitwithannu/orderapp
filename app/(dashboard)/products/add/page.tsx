@@ -55,9 +55,9 @@ export default function AddProductPage() {
   const pouchSizes = ["5G", "10G"];
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-      <div className="max-w-3xl mx-auto bg-white shadow rounded p-8">
-        <h1 className="text-3xl font-bold mb-6">Add New Product</h1>
+   <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
+      <div className="max-w-3xl mx-auto bg-white shadow rounded p-4 md:p-8">
+        <h1 className="md:text-3xl font-bold mb-6">Add New Product</h1>
 
         {/* Product Name */}
         <div className="mb-4">
@@ -75,11 +75,11 @@ export default function AddProductPage() {
         {variants.map((v, index) => (
           <div
             key={index}
-            className="grid grid-cols-4 gap-4 mb-4 items-center"
+            className="flex flex-col md:grid md:grid-cols-4 gap-4 mb-4 items-center"
           >
             {/* Type */}
             <select
-              className="border p-3 rounded"
+              className="border p-3 rounded w-full"
               value={v.type}
               onChange={(e) =>
                 handleVariantChange(index, "type", e.target.value)
@@ -92,7 +92,7 @@ export default function AddProductPage() {
 
             {/* Size */}
             <select
-              className="border p-3 rounded"
+              className="border p-3 rounded w-full"
               value={v.size}
               onChange={(e) =>
                 handleVariantChange(index, "size", e.target.value)
@@ -119,7 +119,7 @@ export default function AddProductPage() {
             {/* Price */}
             <input
               type="number"
-              className="border p-3 rounded"
+              className="border p-3 rounded w-full"
               placeholder="Price"
               value={v.price}
               onChange={(e) =>
@@ -130,7 +130,7 @@ export default function AddProductPage() {
             {/* Remove */}
             <button
               onClick={() => removeVariant(index)}
-              className="px-3 py-2 bg-red-600 text-white rounded"
+              className="w-full px-3 py-3 bg-red-600 text-white rounded"
             >
               X
             </button>
