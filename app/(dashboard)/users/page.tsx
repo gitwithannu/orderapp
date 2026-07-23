@@ -66,16 +66,16 @@ export default function UsersPage() {
 
   return (
     <PermissionGate permission="manage_users">
-      <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">
+       <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
+         <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
+         <h1 className="md:text-3xl font-bold mb-6 text-gray-800">
             User Management
           </h1>
 
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <button
               onClick={() => setOpenModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             >
               + Create User
             </button>
@@ -83,7 +83,7 @@ export default function UsersPage() {
             <input
               type="text"
               placeholder="Search users..."
-              className="border p-3 rounded w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full sm:w-64 border p-3 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -117,7 +117,7 @@ export default function UsersPage() {
 
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr key={user._id} className="border-b hover:bg-gray-50">
+                  <tr key={user._id} className="border-b hover:bg-gray-50 text-[12px] md:text-sm">
                     <td className="p-4">{user.name}</td>
                     <td className="p-4">{user.email}</td>
                     <td className="p-4 capitalize">
@@ -133,7 +133,7 @@ export default function UsersPage() {
                         {user.role}
                       </span>
                     </td>
-                    <td className="p-4">
+                    <td className="p-4 flex flex-col sm:flex-row gap-1">
                       <button 
                       onClick={() => {
                           setSelectedUser(user);
