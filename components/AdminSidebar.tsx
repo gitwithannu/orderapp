@@ -3,60 +3,38 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  FiHome,
-  FiUsers,
-  FiShoppingBag,
-  FiFileText,
-  FiSettings,
-  FiLogOut,
-  FiChevronDown,
+import {FiHome, FiUsers,FiShoppingBag, FiFileText, FiSettings,FiLogOut,FiChevronDown,
 } from "react-icons/fi";
-
 // Create an isolated sub-menu rendering component
-function SidebarItem({
-  item,
-  userPermissions,
-  pathname,
-}: {
-  item: any;
-  userPermissions: string[];
-  pathname: string;
+function SidebarItem({item,userPermissions, pathname,isPinned,isMobile
+}: {item: any;userPermissions: string[];pathname: string;isPinned: boolean;isMobile: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-
-  // Permission Guard
   if (item.permission && !userPermissions.includes(item.permission)) {
     return null;
   }
-
   const hasChildren = item.children && item.children.length > 0;
   const isActive = pathname === item.href;
-
   const isChildActive =
     hasChildren && item.children.some((child: any) => pathname === child.href);
-
   useEffect(() => {
     if (isChildActive) setIsOpen(true);
   }, [isChildActive]);
-
   const isOrdersMenu = item.label === "Orders";
-
   if (hasChildren) {
     return (
       <div className="w-full">
-        {/* Main Parent Row */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className={`
-            w-full flex items-center justify-between p-3 rounded text-[10px] md:text-sm text-left transition text-gray-300 hover:bg-gray-800
+          className={`w-full flex items-center justify-between p-3 rounded text-[10px] md:text-sm text-left transition text-gray-300 hover:bg-gray-800
             ${isChildActive ? "bg-gray-800/50 text-white" : ""}
           `}
         >
           <div className="flex items-center gap-3">
             {item.icon}
-            <span>{item.label}</span>
-
+            { console.log("text before ", isPinned)}
+            { console.log("text before isMobile ", isMobile)}
+           {(!isMobile && isPinned) && <span>{item.label}</span>}
             {/* 🟢 TODAY ORDER COUNT BADGE */}
             {isOrdersMenu && (
               <span className="ml-2 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
@@ -64,15 +42,9 @@ function SidebarItem({
               </span>
             )}
           </div>
-
-          <FiChevronDown
-            size={16}
-            className={`transform transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+          <FiChevronDown size={16} className={`transform transition-transform duration-200 ${ isOpen ? "rotate-180" : "" }`}
           />
         </button>
-
         {/* Collapsible Children Container */}
         {isOpen && (
           <div className="mt-1 pl-6 flex flex-col gap-1 border-l border-gray-700 ml-5">
@@ -80,17 +52,10 @@ function SidebarItem({
               if (
                 child.permission &&
                 !userPermissions.includes(child.permission)
-              ) {
-                return null;
-              }
-
+              ) { return null;  }
               const isChildCurrent = pathname === child.href;
-
               return (
-                <Link
-                  key={child.href}
-                  href={child.href}
-                  className={`
+                <Link key={child.href} href={child.href} className={`
                     flex items-center gap-3 p-2 rounded text-[10px] md:text-sm transition relative
                     ${
                       isChildCurrent
@@ -102,9 +67,7 @@ function SidebarItem({
                   {isChildCurrent && (
                     <span className="absolute -left-6 top-1/2 -translate-y-1/2 h-2 w-2 rounded-full bg-blue-500"></span>
                   )}
-
-                  <span>{child.label}</span>
-
+                  {(!isMobile && isPinned) && <span>{item.label}</span>}
                   {/* 🔴 PENDING ORDER COUNT BADGE */}
                   {child.pendingCount > 0 && (
                     <span className="ml-auto bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">
@@ -119,70 +82,113 @@ function SidebarItem({
       </div>
     );
   }
-
   // Standard Standalone Link (no children)
   return (
-    <Link
-      href={item.href}
-      className={`
+    <Link href={item.href} className={`
         flex items-center gap-3 p-3 rounded relative transition
-        text-[10px] md:text-sm
-        ${isActive ? "bg-gray-800 text-white" : "text-gray-300 hover:bg-gray-800"}
+        text-[10px] md:text-sm ${isActive ? "bg-gray-800 text-white" : "text-gray-300 hover:bg-gray-800"}
       `}
     >
       {isActive && (
         <span className="absolute left-0 top-0 h-full w-1 bg-blue-500 rounded-r"></span>
       )}
       {item.icon}
-      <span>{item.label}</span>
+
+      { console.log("text before aa ", isPinned)}
+      { console.log("text before isMobile ", isMobile)}
+      {(!isMobile && isPinned) && <span>{item.label}</span>}
     </Link>
   );
 }
-
 export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<any>(null);
-
   const [pendingCount, setPendingCount] = useState(0);
   const [todayCount, setTodayCount] = useState(0);
-
+  const [isPinned, setIsPinned] = useState(false);
+  const [isMobile, setIsMobile] = useState(
+    false
+  );
+    const [isshowping, setIsshowping] = useState(
+    typeof window !== "undefined" && window.innerWidth < 768
+  );
   async function loadCounts() {
     try {
       const pendingRes = await fetch("/api/superadmin/orders/pending-count");
       const todayRes = await fetch("/api/superadmin/orders/today-count");
-
       const pendingData = await pendingRes.json();
       const todayData = await todayRes.json();
-
       setPendingCount(pendingData.count);
       setTodayCount(todayData.count);
     } catch (e) {
       console.log("Error fetching counts", e);
     }
   }
-
   useEffect(() => {
     loadCounts();
-
     const interval = setInterval(() => {
       loadCounts();
     }, 5 * 60 * 1000);
-
     return () => clearInterval(interval);
   }, []);
-
   useEffect(() => {
     fetch("/api/me")
       .then((res) => res.json())
       .then((data) => setUser(data.user));
   }, []);
+  useEffect(() => {
+    const saved = localStorage.getItem("sidebarPinned");
+
+    console.log(' -- saved --', saved)
+    if (saved === "true") {
+       console.log(' -- saved -- manually check true' )
+      setIsPinned(true);
+    }
+  }, []);
+  const togglePin = () => {
+    console.log('click to pin ');
+    console.log('isPinned ', isPinned)
+    const newState = !isPinned;
+    console.log('newState ', newState)
+    setIsPinned(newState);
+    localStorage.setItem("sidebarPinned", newState ? "true" : "false");
+  };
+
+  useEffect(() => {
+    console.log('resize')
+    
+    console.log('with ', window.innerWidth)
+    console.log('isMobile ', isMobile)
+    console.log('IsPinned ', isPinned)
+    const nowMobile = window.innerWidth < 768;
+      if (!nowMobile) {
+         console.log('not mobile aa')
+        setIsPinned(true);
+      
+      }
+
+    const handleResize = () => {
+      const nowMobile = window.innerWidth < 768;
+      console.log('with ', window.innerWidth)
+      console.log('with type ', nowMobile)
+      setIsMobile(false);
+       setIsshowping(true)
+
+      if (!nowMobile) {
+         console.log('not mobile')
+         setIsshowping(false)
+        setIsPinned(true);
+        localStorage.removeItem("sidebarPinned");
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (!user) return null;
-
   const userPermissions = user.permissions || [];
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
   const sidebarConfig = [
     {
       heading: "MAIN",
@@ -296,41 +302,39 @@ export default function Sidebar() {
       ],
     },
   ];
-
   const handleLogout = async () => {
     await fetch("/api/logout");
     router.push("/login");
   };
-
   return (
-    <aside className="w-35 md:w-64 h-full bg-gray-900 text-white flex flex-col p-2 md:p-4 ">
+   <aside className={`
+  bg-gray-900 text-white flex flex-col p-2 md:p-4 transition-all relative
+  ${!isMobile && !isPinned ? "w-14" : "w-35 md:w-64"}`}>
+   
       <span className="hidden md:inline">{user.role} Panel</span>
-
       <nav className="flex flex-col gap-6 flex-grow overflow-y-auto">
+       
+        {isshowping && (
+           <div key="pin" >
+           <div className="flex flex-col gap-1 p-4 ">
+         {/* MOBILE PIN BUTTON */}
+          <button onClick={togglePin} className="absolute top-3 right-3 text-gray-300 hover:text-white" > {isPinned ? "📌" : "📍"}  </button>
+        </div>
+        </div>
+        )}
+       
         {sidebarConfig.map((section) => (
           <div key={section.heading}>
-            <p className="text-[9px] md:text-xs text-gray-400 font-semibold mb-2 px-2 md:px-4">
-              {section.heading}
-            </p>
-
+            <p className="text-[9px] md:text-xs text-gray-400 font-semibold mb-2 px-2 md:px-4">  {section.heading} </p>
             <div className="flex flex-col gap-1">
               {section.items.map((item) => (
-                <SidebarItem
-                  key={item.label + item.href}
-                  item={item}
-                  userPermissions={userPermissions}
-                  pathname={pathname}
-                />
+                <SidebarItem key={item.label + item.href} item={item} userPermissions={userPermissions} pathname={pathname} isPinned={isPinned} isMobile={isMobile} />
               ))}
             </div>
           </div>
         ))}
       </nav>
-
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-3 p-3 rounded text-gray-300 hover:bg-red-600 hover:text-white transition mt-auto"
-      >
+      <button onClick={handleLogout} className="flex items-center gap-3 p-3 rounded text-gray-300 hover:bg-red-600 hover:text-white transition mt-auto" >
         <FiLogOut size={isMobile ? 15 : 18} />
         <span>Logout</span>
       </button>
