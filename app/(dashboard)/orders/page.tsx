@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import PermissionGate from "@/components/PermissionGate";
 import OrderDetailsModal from "@/components/OrderDetailsModal";
 import type { IOrder } from "@/models/Order";
-
 export default function OrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
   const [search, setSearch] = useState("");
@@ -13,7 +12,7 @@ export default function OrdersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<IOrder | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-
+  const [isLoading, setIsLoading] = useState(false);
   const statusStyles: Record<string, string> = {
     pending: "bg-amber-100 text-amber-800 border-amber-200",
     confirmed: "bg-blue-100 text-blue-800 border-blue-200",
@@ -24,39 +23,47 @@ export default function OrdersPage() {
   };
 
   const fetchOrders = () => {
+    setIsLoading(true); // Turn loader ON
     const params = new URLSearchParams();
     params.set("page", String(page));
     params.set("limit", "10");
     if (statusFilter) params.set("status", statusFilter);
     if (search) params.set("search", search);
-
     fetch(`/api/superadmin/orders?${params.toString()}`)
       .then((res) => res.json())
       .then((data) => {
         setOrders(data.orders);
         setTotalPages(data.totalPages);
+      })
+      .catch((err) => console.error("Error fetching orders:", err))
+      .finally(() => {
+        setIsLoading(false); // Turn loader OFF
       });
   };
 
   useEffect(() => {
     fetchOrders();
   }, [page, statusFilter]);
-
   const handleStatusChange = async (status: string) => {
     if (!selectedOrder) return;
-
-    const res = await fetch("/api/superadmin/orders", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: selectedOrder._id, status }),
-    });
-
-    if (res.ok) {
-      setDetailsOpen(false);
-      fetchOrders();
+    setIsLoading(true); // Turn loader ON
+    try {
+      const res = await fetch("/api/superadmin/orders", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: selectedOrder._id, status }),
+      });
+      if (res.ok) {
+        setDetailsOpen(false);
+        fetchOrders();
+      } else {
+        setIsLoading(false); // Turn loader OFF if response fails
+      }
+    } catch (error) {
+      console.error("Error changing status:", error);
+      setIsLoading(false); // Turn loader OFF on error
     }
   };
-
   const statuses = [
     "pending",
     "confirmed",
@@ -65,20 +72,29 @@ export default function OrdersPage() {
     "delivered",
     "cancelled",
   ];
-
   return (
     <PermissionGate permission="view_all_orders">
-      <div className="p-8 bg-gray-50 min-h-screen">
-        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">
+      <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
+        {/* Loading Spinner Overlay */}
+        {isLoading && (
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
+            <div className="bg-white p-5 rounded-xl shadow-xl flex flex-col items-center gap-3">
+              <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <p className="text-sm font-medium text-gray-700">Processing...</p>
+            </div>
+          </div>
+        )}
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-4 md:p-8">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <h1 className="text-2xl font-bold mb-6 text-gray-800">
             Orders Management
           </h1>
-
-          <div className="flex flex-wrap gap-4 justify-between items-center mb-6">
+          </div>
+          <div className="flex flex-col lg:flex-row gap-4 justify-between lg:items-center mb-6">
             <input
               type="text"
               placeholder="Search by order, customer, phone..."
-              className="border p-3 rounded w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border p-3 rounded w-full md:w-1/3 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={(e) => {
@@ -88,15 +104,14 @@ export default function OrdersPage() {
                 }
               }}
             />
-
-            <div className="flex flex-wrap gap-2 items-center">
-              <span className="text-sm text-gray-600">Status:</span>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 max-w-full [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <span className="text-sm text-gray-600 shrink-0">Status:</span>
               <button
                 onClick={() => {
                   setStatusFilter("");
                   setPage(1);
                 }}
-                className={`px-3 py-1 rounded text-sm border ${
+                className={`px-3 py-1 rounded text-sm border shrink-0 ${
                   statusFilter === ""
                     ? "bg-blue-600 text-white border-blue-600"
                     : "bg-white text-gray-700 hover:bg-gray-100"
@@ -111,7 +126,7 @@ export default function OrdersPage() {
                     setStatusFilter(s);
                     setPage(1);
                   }}
-                  className={`px-3 py-1 rounded text-sm border capitalize ${
+                  className={`px-3 py-1 rounded text-sm border capitalize shrink-0 ${
                     statusFilter === s
                       ? "bg-blue-600 text-white border-blue-600"
                       : "bg-white text-gray-700 hover:bg-gray-100"
@@ -123,19 +138,19 @@ export default function OrdersPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-x-auto border rounded-md">
+            <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
-                <tr className="bg-gray-100 border-b text-gray-700 text-sm">
-                  <th className="p-3">Order #</th>
-                  <th className="p-3">Customer</th>
-                  <th className="p-3">Phone</th>
-                  <th className="p-3">Store</th>
-                  <th className="p-3">Agent</th>
-                  <th className="p-3 text-right">Total</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Created</th>
-                  <th className="p-3">Actions</th>
+                <tr className="bg-gray-100 border-b text-gray-700 text-[12px] md:text-sm whitespace-nowrap">
+                  <th className="p-1">Order #</th>
+                  <th className="p-1">Customer</th>
+                  <th className="p-1 hidden md:table-cell">Phone</th>
+                  <th className="p-1">Store</th>
+                  <th className="p-1">Agent</th>
+                  <th className="p-1 text-right">Total</th>
+                  <th className="p-1">Status</th>
+                  <th className="p-1">Created</th>
+                  <th className="p-1">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,13 +158,13 @@ export default function OrdersPage() {
                   orders?.length > 0 ? (
                   orders.map(
                     (order) => (
-                    <tr key={order._id.toString()} className="border-b hover:bg-gray-50 text-sm">
-                      <td className="p-3 ">{order.orderNumber}</td>
-                      <td className="p-3">{order.customerName}</td>
-                      <td className="p-3">{order.customerPhone}</td>
-                      <td className="p-3">{order.store?.storeName}</td>
-                      <td className="p-3">{order.agent?.name}</td>
-                      <td className="p-3 text-right">
+                    <tr key={order._id.toString()} className="border-b hover:bg-gray-50 text-[12px] md:text-sm whitespace-nowrap">
+                      <td className="p-1 font-medium text-gray-900">{order.orderNumber}</td>
+                      <td className="p-1 text-gray-700">{order.customerName}</td>
+                      <td className="p-1 text-gray-600 hidden md:table-cell">{order.customerPhone}</td>
+                      <td className="p-1 text-gray-600">{order.store?.storeName}</td>
+                      <td className="p-1 text-gray-600">{order.agent?.name}</td>
+                      <td className="p-1 text-right font-semibold text-gray-900">
                         ₹ {order.totalAmount.toFixed(2)}
                       </td>
                       <td className="p-3">
@@ -157,20 +172,19 @@ export default function OrdersPage() {
                           {order.status}
                         </span>
                       </td>
-                      <td className="p-3">
+                     <td className="p-3 text-gray-500">
                         {new Date(order.createdAt).toLocaleString()}
                       </td>
-                      <td className="p-3">
+                     <td className="p-3 text-center">
                         <button
                           onClick={() => {
                             setSelectedOrder(order);
                             setDetailsOpen(true);
                           }}
-                          className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 transition"
+                         className="px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700 transition"
                         >
                           View
                         </button> | 
-
                         <button
                           onClick={() => {
                             const params = new URLSearchParams();
@@ -183,21 +197,13 @@ export default function OrdersPage() {
                         >
                           Export CSV
                       </button>
-
-
                       </td>
                     </tr>
                   )
-                )
-                
-               ) : (
-
-               
+                )         
+               ) : (          
                   <tr>
-                    <td
-                      className="p-6 text-center text-gray-500"
-                      colSpan={9}
-                    >
+                    <td className="p-6 text-center text-gray-500" colSpan={9}>
                       No orders found
                     </td>
                   </tr>
@@ -205,28 +211,20 @@ export default function OrdersPage() {
               </tbody>
             </table>
           </div>
-
-          <div className="flex justify-center gap-4 mt-6">
+          <div className="flex justify-center items-center gap-4 mt-6">
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2 text-sm">
-              Page {page} of {totalPages}
-            </span>
+              className="px-4 py-2 bg-gray-200 text-sm font-medium rounded disabled:opacity-50 transition active:scale-95"
+            > Previous</button>
+            <span className="text-sm font-medium text-gray-700">Page {page} of {totalPages} </span>
             <button
               disabled={page === totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-            >
-              Next
-            </button>
+              className="px-4 py-2 bg-gray-200 text-sm font-medium rounded disabled:opacity-50 transition active:scale-95"
+            > Next </button>
           </div>
         </div>
-
         <OrderDetailsModal
           isOpen={detailsOpen}
           order={selectedOrder}
