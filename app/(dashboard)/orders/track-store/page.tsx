@@ -60,7 +60,8 @@ export default function InactiveStoresOrdersPage() {
 
   return (
     <PermissionGate permission="view_all_orders">
-      <div className="p-8 bg-gray-50 min-h-[100dvh] flex flex-col">
+      <div className="p-1 md:p-8 bg-gray-50 min-h-screen">
+        {/* Loading Spinner Overlay */}
         {isLoading && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 transition-all">
             <div className="bg-white p-5 rounded-xl shadow-xl flex flex-col items-center gap-3">
@@ -69,8 +70,8 @@ export default function InactiveStoresOrdersPage() {
             </div>
           </div>
         )}
-        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-8 flex-grow">
-          <h1 className="text-3xl font-bold mb-6 text-gray-800">
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-md p-1 md:p-8 flex-grow">
+          <h1 className="md:text-3xl font-bold mb-6 text-gray-800">
             Stores With No Recent Orders
           </h1>
 
@@ -93,12 +94,11 @@ export default function InactiveStoresOrdersPage() {
                 <option value="2_months">2 Months</option>
               </select>
             </div>
-
-            <div className="flex flex-wrap gap-2 items-center w-full md:w-auto mt-4">
+          <div className="flex flex-col lg:flex-row gap-4 justify-between lg:items-center mb-6 w-full sm:w-64 lg:w-100">
               <input
                 type="text"
                 placeholder="Search by store name, city, state..."
-                className="border p-3 rounded w-full md:w-80 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border p-3 rounded w-full  focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => {
@@ -117,13 +117,11 @@ export default function InactiveStoresOrdersPage() {
             </div>
           </div>
 
-          {error && <div className="mb-4 text-red-500 bg-red-50 p-3 rounded">{error}</div>}
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="w-full overflow-x-auto border rounded-md">
+            <table className="w-full text-left border-collapse min-w-[900px]">
               <thead>
                 <tr className="bg-gray-100 border-b text-gray-700 text-sm">
-                  <th className="p-3">Store ID</th>
+                  <th className="p-3 hidden md:table-cell">Store ID</th>
                   <th className="p-3">Store Name</th>
                   <th className="p-3">City</th>
                   <th className="p-3">State</th>
@@ -137,7 +135,7 @@ export default function InactiveStoresOrdersPage() {
                 {stores?.length > 0 ? (
                   stores.map((store: any) => (
                     <tr key={store._id} className="border-b hover:bg-gray-50 text-sm">
-                      <td className="p-3 font-mono text-xs text-gray-500">{store._id}</td>
+                      <td className="p-3 font-mono text-xs text-gray-500 hidden md:table-cell">{store._id}</td>
                       <td className="p-3 font-semibold text-gray-800">{store.storeName || "Unnamed Store"}</td>
                       <td className="p-3">{store.city || "—"}</td>
                       <td className="p-3">{store.state || "—"}</td>
